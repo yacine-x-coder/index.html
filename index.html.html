@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oasis - Premium Full Multi-Language Website</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+
+<style>
+    /* الإعدادات الأساسية */
+    :root {
+        --primary: #00b4ff;
+        --primary-dark: #0055ff;
+        --secondary: #28a745;
+        --red-accent: #d3112c;
+        --dark: #333;
+        --light: #f9f9f9;
+        --input-border: #ccc;
+    }
+
+    * {
+        box-sizing: border-box;
+        font-family: 'Cairo', sans-serif;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        margin: 0;
+        background-image: url("./imgs/the_final_background.gif");
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: var(--dark);
+        overflow-x: hidden;
+        transition: direction 0.5s ease;
+    }
+
+    /* شريط التنقل */
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        padding: 15px 30px;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(15px);
+        border-bottom: 1px solid rgba(0, 180, 255, 0.3);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar img {
+        height: 50px;
+        transition: transform 0.3s ease;
+        mix-blend-mode: multiply;
+    }
+
+    .navbar img:hover { transform: scale(1.05); }
+
+    .menu-btn {
+        margin-inline-start: auto;
+        font-size: 28px;
+        cursor: pointer;
+        color: var(--primary);
+        transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .menu-btn.rotate { transform: rotate(180deg); color: var(--secondary); }
+
+    /* القائمة المنسدلة الرئيسية */
+    .nav-menu {
+        position: fixed;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 20px 0;
+        transform: translateY(-150%);
+        opacity: 0;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 998;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .nav-menu.active { transform: translateY(0); opacity: 1; }
+
+    .nav-menu a {
+        text-decoration: none;
+        color: var(--dark);
+        font-weight: 700;
+        font-size: 1rem;
+        position: relative;
+        padding: 5px 0;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.4s ease;
+    }
+
+    .nav-menu.active a { opacity: 1; transform: translateY(0); }
+
+    .nav-menu a::after {
+        content: "";
+        position: absolute;
+        width: 0%;
+        height: 3px;
+        background: var(--primary);
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        transition: width 0.3s ease;
+    }
+
+    .nav-menu a:hover::after { width: 100%; }
+
+    .lang-container {
+        position: relative;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.4s ease;
+    }
+
+    .nav-menu.active .lang-container { opacity: 1; transform: translateY(0); }
+
+    .lang-btn {
+        background: linear-gradient(45deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 6px 15px;
+        border-radius: 15px;
+        font-weight: bold;
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.3s;
+    }
+
+    .lang-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4); }
+
+    .lang-dropdown {
+        position: absolute;
+        top: 130%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-15px);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(15px);
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        display: flex;
+        flex-direction: column;
+        min-width: 130px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        overflow: hidden;
+    }
+
+    .lang-dropdown.active { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+    .lang-dropdown span {
+        padding: 12px 20px;
+        color: var(--dark);
+        font-weight: 700;
+        cursor: pointer;
+        text-align: center;
+        transition: 0.3s;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .lang-dropdown span:hover { background: rgba(0, 180, 255, 0.1); color: var(--primary-dark); padding-inline-start: 25px; }
+
+    /* قسم البداية */
+    .hero {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+
+    .hero img {
+        width: 70vw;
+        max-width: 800px;
+        object-fit: contain;
+        opacity: 0;
+        mix-blend-mode: multiply;
+        animation: heroDropReveal 1.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
+                   floatLiquid 6s ease-in-out infinite 1.8s,
+                   glowLiquid 4s ease-in-out infinite 1.8s;
+    }
+
+    @keyframes heroDropReveal {
+        0% { opacity: 0; transform: translateY(-200px) scale(0.6); filter: blur(15px); }
+        80% { transform: translateY(15px) scale(1.05); }
+        100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+
+    @keyframes floatLiquid {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-25px); }
+    }
+
+    @keyframes glowLiquid {
+        0%, 100% { filter: drop-shadow(0 0 10px rgba(0,180,255,0.2)); }
+        50% { filter: drop-shadow(0 0 30px rgba(0,180,255,0.7)) drop-shadow(0 0 10px rgba(40,167,69,0.3)); }
+    }
+
+    /* أقسام المحتوى الأساسية */
+    .section {
+        min-height: 80vh;
+        padding: 100px 5vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    #products.section {
+        background: transparent;
+        backdrop-filter: none;
+        border-top: none;
+    }
+
+    .section-title {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        background: linear-gradient(to right, var(--primary), var(--primary-dark), var(--secondary));
+        background-size: 200% auto;
+        color: #000;
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shineGradient 4s linear infinite;
+        text-align: center;
+    }
+
+    @keyframes shineGradient { to { background-position: 200% center; } }
+
+    .section-desc {
+        font-size: 1.4rem;
+        line-height: 2;
+        text-align: center;
+        max-width: 800px;
+        color: #fff;
+        text-shadow: 1px 1px 5px rgba(0,0,0,0.5); 
+        font-weight: 700;
+    }
+
+    .reveal-blur {
+        opacity: 0;
+        filter: blur(15px);
+        transform: translateY(40px);
+        transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .reveal-blur.active {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+    }
+
+    /* البطاقات */
+    .tilt-card {
+        background: rgba(255, 255, 255, 0.08); 
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: 1px solid rgba(255, 255, 255, 0.4);
+        border-left: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        border-radius: 20px;
+        transform-style: preserve-3d;
+        transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+    }
+
+    .tilt-card:not(:hover) {
+        transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.6s;
+    }
+
+    /* الإحصائيات */
+    .stats-container { display: flex; gap: 40px; margin-top: 50px; flex-wrap: wrap; justify-content: center; }
+    .stat-box { padding: 40px; text-align: center; min-width: 250px; }
+    .stat-number { font-size: 4rem; font-weight: 900; color: var(--secondary); margin-bottom: 10px; transform: translateZ(30px); }
+    .stat-text { font-size: 1.2rem; font-weight: bold; color: var(--dark); text-shadow: 0px 0px 5px rgba(255,255,255,0.8); transform: translateZ(20px); }
+
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; width: 100%; max-width: 1200px; margin-top: 40px; }
+    .info-card { padding: 40px; text-align: center; }
+    .info-card h3 { color: var(--primary-dark); font-size: 1.8rem; margin-bottom: 15px; transform: translateZ(30px); }
+    .info-card p { color: #222; font-size: 1.1rem; line-height: 1.6; font-weight: bold; text-shadow: 0px 0px 5px rgba(255,255,255,0.8); transform: translateZ(20px); }
+
+    /* قسم عرض المنتجات */
+    .showcase-wrapper { width: 100%; max-width: 1200px; margin-top: 30px; display: flex; flex-direction: column; gap: 50px; padding: 40px; }
+    .showcase-top { display: flex; align-items: center; justify-content: space-between; min-height: 400px; gap: 40px; }
+    .showcase-text { flex: 1; text-align: start; padding: 0 20px; transform: translateZ(40px); }
+    .showcase-brand { font-size: 4rem; font-weight: 900; color: var(--red-accent); margin: 0 0 10px 0; line-height: 1.2; text-shadow: 2px 2px 10px rgba(255,255,255,0.5); }
+    .showcase-subtitle { font-size: 1.5rem; color: #111; margin-bottom: 30px; font-weight: bold; text-shadow: 0 0 5px white; }
+    .showcase-btn { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); border: 2px solid var(--red-accent); color: var(--red-accent); padding: 10px 30px; border-radius: 5px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: 0.3s; }
+    .showcase-btn:hover { background: var(--red-accent); color: white; box-shadow: 0 5px 15px rgba(211, 17, 44, 0.4); }
+
+    .showcase-img-wrap { flex: 1.5; display: flex; justify-content: center; align-items: center; position: relative; transform: translateZ(50px); }
+    #mainProductImg { max-height: 450px; max-width: 100%; object-fit: contain; transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); animation: floatLiquid 5s infinite ease-in-out; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.25)); }
+    #mainProductImg.fade-out { opacity: 0; transform: scale(0.8); }
+
+    .showcase-bottom { display: flex; align-items: center; justify-content: center; gap: 20px; width: 100%; transform: translateZ(20px); }
+    .nav-arrow { background: var(--red-accent); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(211, 17, 44, 0.3); transition: 0.3s; z-index: 10; }
+    .nav-arrow:hover { transform: scale(1.1); }
+
+    .thumbnails-track { display: flex; gap: 30px; overflow-x: auto; padding: 20px 10px; scrollbar-width: none; scroll-behavior: smooth; }
+    .thumbnails-track::-webkit-scrollbar { display: none; }
+
+    .thumbnail { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.3s; opacity: 0.6; scroll-snap-align: center; }
+    .thumbnail:hover, .thumbnail.active { opacity: 1; transform: translateY(-10px); }
+
+    .thumb-circle { width: 100px; height: 100px; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; display: flex; justify-content: center; align-items: center; padding: 15px; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); animation: morphShape 8s ease-in-out infinite alternate; }
+    @keyframes morphShape { 0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; } 34% { border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%; } 67% { border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%; } 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; } }
+    .thumbnail.active .thumb-circle { background: rgba(255, 255, 255, 0.8); border: 2px solid var(--red-accent); border-radius: 50%; box-shadow: 0 0 25px rgba(211, 17, 44, 0.4); animation: none; transform: scale(1.15); }
+    .thumb-circle img { max-width: 100%; max-height: 100%; object-fit: contain; transition: 0.3s; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2)); }
+    .thumbnail.active .thumb-circle img { transform: scale(1.2); }
+    .thumb-label { font-weight: 700; color: var(--dark); text-align: center; font-size: 0.95rem; max-width: 120px; background: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 10px; }
+
+    /* قسم اتصل بنا */
+    .contact-form-container { padding: 50px; width: 100%; max-width: 800px; margin-top: 50px; }
+    .contact-form { display: flex; flex-direction: column; gap: 30px; transform: translateZ(20px); }
+    .contact-radio-group { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; }
+    .contact-radio-group p { margin: 0; font-weight: 700; color: #111; text-shadow: 0 0 5px white; }
+    .contact-radio-option { display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: bold; }
+    .contact-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+    .contact-form-group { position: relative; }
+    .contact-input, .contact-textarea { width: 100%; padding: 15px 15px 15px 50px; background: rgba(255, 255, 255, 0.8); border: 1px solid var(--input-border); border-radius: 10px; font-size: 1rem; transition: border-color 0.3s; }
+    .contact-textarea { resize: vertical; height: 150px; }
+    .contact-input:focus, .contact-textarea:focus { border-color: var(--primary); outline: none; }
+    .contact-icon { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); width: 20px; height: 20px; fill: #aaa; transition: fill 0.3s; }
+    .contact-input:focus + .contact-icon { fill: var(--primary); }
+    .contact-textarea + .contact-icon { top: 30px; }
+    .contact-submit-btn { background: linear-gradient(45deg, var(--red-accent), #ff3b55); color: white; padding: 15px 40px; border: none; border-radius: 20px; font-weight: 700; font-size: 1.1rem; cursor: pointer; align-self: center; box-shadow: 0 5px 15px rgba(211, 17, 44, 0.3); transition: 0.3s; }
+    .contact-submit-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(211, 17, 44, 0.4); }
+
+    /* =========================================
+       زر الدردشة العائم 
+       ========================================= */
+    .floating-chat-btn {
+        position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px;
+        background: var(--red-accent); border-radius: 50%; display: flex; justify-content: center; align-items: center;
+        box-shadow: 0 5px 20px rgba(211, 17, 44, 0.4); cursor: pointer; z-index: 999;
+        animation: chatSlideIn 1s cubic-bezier(0.25, 1, 0.5, 1) forwards 0.5s, floatChat 4s ease-in-out infinite 1.5s;
+        opacity: 0; transform: translateY(100px); transition: 0.3s;
+    }
+    .chat-pulse { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; border-radius: 50%; border: 2px solid var(--red-accent); z-index: -1; animation: chatRipple 2s infinite cubic-bezier(0.65, 0, 0.34, 1); }
+    .floating-chat-btn svg { width: 30px; height: 30px; fill: white; transition: 0.4s; }
+    .floating-chat-btn:hover { background: #ff2e43; box-shadow: 0 10px 30px rgba(211, 17, 44, 0.6); animation-play-state: paused; transform: scale(1.1) translateY(-5px) !important; }
+    .floating-chat-btn:hover svg { transform: scale(1.15) rotate(-10deg); }
+    @keyframes chatRipple { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.7); opacity: 0; } }
+    @keyframes chatSlideIn { 0% { opacity: 0; transform: translateY(100px) scale(0.5); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes floatChat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    /* =========================================
+       نافذة الدردشة الكبيرة (Modal Chat) 
+       ========================================= */
+    .chat-overlay {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
+        z-index: 2000; display: flex; justify-content: center; align-items: center;
+        opacity: 0; visibility: hidden; transition: all 0.4s ease;
+    }
+    .chat-overlay.active { opacity: 1; visibility: visible; }
+    
+    .chat-window {
+        width: 95%; max-width: 1000px; /* تم التكبير لراحة المستخدم */
+        height: 90vh; /* تم التكبير لراحة المستخدم */
+        background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px);
+        border-radius: 24px; display: flex; flex-direction: column; overflow: hidden;
+        transform: translateY(50px) scale(0.9); transition: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.5);
+        position: relative;
+    }
+    .chat-overlay.active .chat-window { transform: translateY(0) scale(1); }
+    
+    .chat-shapes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none; }
+    .shape { position: absolute; filter: blur(60px); border-radius: 50%; opacity: 0.6; animation: floatShape 10s infinite alternate ease-in-out; }
+    .shape-1 { width: 300px; height: 300px; background: var(--primary); top: -100px; right: -100px; }
+    .shape-2 { width: 400px; height: 400px; background: var(--red-accent); bottom: -150px; left: -100px; animation-delay: -5s; }
+    @keyframes floatShape { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.2); } }
+
+    .chat-header {
+        padding: 20px 30px; background: rgba(255,255,255,0.7); border-bottom: 1px solid rgba(0,0,0,0.05);
+        display: flex; justify-content: space-between; align-items: center; z-index: 1;
+    }
+    .chat-header h3 { margin: 0; color: var(--dark); font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
+    .chat-header h3::before { content: ''; display: inline-block; width: 12px; height: 12px; background: #28a745; border-radius: 50%; box-shadow: 0 0 10px #28a745; }
+    
+    /* أزرار الهيدر (التصغير والإغلاق) */
+    .chat-header-actions { display: flex; gap: 10px; }
+    .action-btn { 
+        background: transparent; border: none; font-size: 1.5rem; color: #888; cursor: pointer; 
+        transition: 0.3s; width: 35px; height: 35px; border-radius: 50%; 
+        display: flex; justify-content: center; align-items: center;
+    }
+    .action-btn:hover { background: rgba(0,0,0,0.05); }
+    .minimize-btn:hover { color: var(--primary); }
+    .close-btn:hover { color: var(--red-accent); transform: rotate(90deg); }
+
+    .chat-body { flex: 1; overflow-y: auto; padding: 30px; z-index: 1; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
+    
+    .message { max-width: 75%; padding: 15px 25px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; line-height: 1.5; opacity: 0; animation: msgPopIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    .message.bot { background: white; color: var(--dark); align-self: flex-start; border-bottom-right-radius: 5px; transform-origin: bottom right; }
+    .message.user { background: linear-gradient(135deg, var(--red-accent), #ff3b55); color: white; align-self: flex-end; border-bottom-left-radius: 5px; transform-origin: bottom left; box-shadow: 0 10px 20px rgba(211, 17, 44, 0.2); }
+    @keyframes msgPopIn { 0% { opacity: 0; transform: scale(0.8) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+
+    .chat-footer { padding: 20px 30px; background: rgba(255,255,255,0.7); z-index: 1; display: flex; gap: 15px; border-top: 1px solid rgba(0,0,0,0.05); }
+    .chat-footer input { flex: 1; padding: 15px 25px; border-radius: 30px; border: 1px solid #ddd; outline: none; font-size: 1.1rem; background: rgba(255,255,255,0.9); box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); transition: 0.3s; }
+    .chat-footer input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 180, 255, 0.2); }
+    .chat-footer button { width: 55px; height: 55px; border-radius: 50%; background: var(--primary); border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(0, 180, 255, 0.3); }
+    .chat-footer button:hover { transform: scale(1.1) rotate(-10deg); background: var(--primary-dark); }
+    .chat-footer button svg { width: 24px; height: 24px; fill: white; transform: translateX(-2px); }
+
+    /* =========================================
+       نافذة التأكيد عند إغلاق المحادثة
+       ========================================= */
+    .chat-confirm-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255,255,255,0.7); backdrop-filter: blur(8px);
+        z-index: 10; display: flex; justify-content: center; align-items: center;
+        opacity: 0; visibility: hidden; transition: 0.3s ease;
+    }
+    .chat-confirm-overlay.active { opacity: 1; visibility: visible; }
+    .chat-confirm-box {
+        background: white; padding: 30px; border-radius: 20px; text-align: center;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.05);
+        max-width: 450px; width: 90%; transform: scale(0.8); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .chat-confirm-overlay.active .chat-confirm-box { transform: scale(1); }
+    .chat-confirm-box h4 { color: var(--red-accent); margin-top: 0; font-size: 1.5rem; margin-bottom: 15px; }
+    .chat-confirm-box p { color: #555; font-size: 1.1rem; margin-bottom: 30px; font-weight: bold; }
+    .chat-confirm-actions { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+    .btn-cancel, .btn-confirm { padding: 12px 25px; border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+    .btn-cancel { background: #f0f0f0; color: #333; }
+    .btn-cancel:hover { background: #e0e0e0; transform: translateY(-2px); }
+    .btn-confirm { background: var(--red-accent); color: white; }
+    .btn-confirm:hover { background: #b00e24; box-shadow: 0 5px 15px rgba(211, 17, 44, 0.3); transform: translateY(-2px); }
+
+    @media (max-width: 768px) {
+        .showcase-top { flex-direction: column; text-align: center; }
+        .showcase-text { text-align: center; }
+        .contact-form-row { grid-template-columns: 1fr; }
+        .floating-chat-btn { bottom: 20px; right: 20px; width: 55px; height: 55px; }
+        .chat-window { width: 100%; height: 100vh; border-radius: 0; }
+        .message { max-width: 90%; }
+        .action-btn { width: 45px; height: 45px; }
+    }
+</style>
+</head>
+
+<body>
+<header class="navbar">
+    <img id="mainProductNameHeader" src="imgs/oasis_logo_not_background.png" alt="Oasis Header Logo">
+    <div class="menu-btn" onclick="toggleNav()">☰</div>
+</header>
+
+<nav class="nav-menu" id="navMenu">
+    <a href="#home" data-i18n="home" onclick="toggleNav()">الرئيسية</a>
+    <a href="#about" data-i18n="about" onclick="toggleNav()">معلومات عنا</a>
+    <a href="#products" data-i18n="products" onclick="toggleNav()">منتجاتنا</a>
+    <a href="#distributors" data-i18n="distributors" onclick="toggleNav()">موزعينا</a>
+    <a href="#competitions" data-i18n="competitions" onclick="toggleNav()">مسابقات</a>
+    <a href="#media" data-i18n="media" onclick="toggleNav()">وسائل الإعلام</a>
+    <a href="#stats" data-i18n="stats" onclick="toggleNav()">إحصائياتنا</a>
+    <a href="#contact" data-i18n="contact" onclick="toggleNav()">اتصل بنا</a>
+    
+    <div class="lang-container">
+        <div class="lang-btn" onclick="toggleLangMenu()">
+            <span id="currentLang">AR</span> 
+            <span style="font-size: 0.8rem;">▼</span>
+        </div>
+        <div class="lang-dropdown" id="langDropdown">
+            <span onclick="changeLanguage('ar')">العربية - AR</span>
+            <span onclick="changeLanguage('en')">English - EN</span>
+            <span onclick="changeLanguage('fr')">Français - FR</span>
+        </div>
+    </div>
+</nav>
+
+<section id="home" class="hero">
+    <img src="./imgs/oasis_logo_not_background.png" alt="Oasis Big Logo">
+</section>
+
+<section id="about" class="section">
+    <h2 class="section-title reveal-blur" data-i18n="about_title">رؤيتنا للمستقبل</h2>
+    <p class="section-desc reveal-blur" data-i18n="about_desc" style="transition-delay: 0.2s;">
+        نحن نسعى لتقديم أفضل المنتجات بأعلى معايير الجودة العالمية. تصميمنا مستوحى من الطبيعة، ونعمل باستمرار على تطوير حلول مبتكرة تلبي تطلعات عملائنا وترتقي بأسلوب حياتهم إلى مستوى آخر من الفخامة.
+    </p>
+</section>
+
+<section id="products" class="section">
+    <h2 class="section-title reveal-blur" data-i18n="products">منتجاتنا</h2>
+    <div class="showcase-wrapper tilt-card reveal-blur" style="transition-delay: 0.2s;">
+        <div class="showcase-top">
+            <div class="showcase-text">
+                <h1 class="showcase-brand" id="mainProductName" data-i18n="prod_1_name">الواحة ns - التفاح 1لتر</h1>
+                <p class="showcase-subtitle" id="mainProductDesc" data-i18n="discover_all">اكتشف جميع منتجاتنا</p>
+                <button class="showcase-btn" data-i18n="btn_discover">اكتشف</button>
+            </div>
+            <div class="showcase-img-wrap">
+               <img id="mainProductImg" src="mon_not_background/nss.png" alt="Oasis Logo">
+            </div>
+        </div>
+        <div class="showcase-bottom">
+            <button class="nav-arrow" onclick="prevProduct()">❮</button>
+            <div class="thumbnails-track" id="thumbnailsTrack"></div>
+            <button class="nav-arrow" onclick="nextProduct()">❯</button>
+        </div>
+    </div>
+</section>
+
+<section id="distributors" class="section">
+    <h2 class="section-title reveal-blur" data-i18n="dist_title">موزعينا المعتمدين</h2>
+    <div class="cards-grid">
+        <div class="info-card tilt-card reveal-blur" style="transition-delay: 0.1s;">
+            <h3 data-i18n="dist_local">محلياً</h3>
+            <p data-i18n="dist_local_desc">شبكة واسعة تغطي جميع مناطق الوطن لضمان وصول منتجاتنا إليكم بسرعة وسهولة.</p>
+        </div>
+        <div class="info-card tilt-card reveal-blur" style="transition-delay: 0.3s;">
+            <h3 data-i18n="dist_global">دولياً</h3>
+            <p data-i18n="dist_global_desc">نحن فخورون بشراكاتنا الدولية التي تساهم في تقديم جودتنا للأسواق العالمية.</p>
+        </div>
+    </div>
+</section>
+
+<section id="competitions" class="section">
+    <h2 class="section-title reveal-blur" data-i18n="comp_media_title">تفاعل معنا</h2>
+    <div class="cards-grid">
+        <div class="info-card tilt-card reveal-blur" style="transition-delay: 0.1s;" id="media">
+            <h3 data-i18n="media">وسائل الإعلام</h3>
+            <p data-i18n="media_desc">تابع آخر أخبارنا، الإصدارات الصحفية، والفعاليات التي نشارك فيها عبر منصاتنا المتعددة.</p>
+        </div>
+        <div class="info-card tilt-card reveal-blur" style="transition-delay: 0.3s;">
+            <h3 data-i18n="competitions">مسابقات</h3>
+            <p data-i18n="comp_desc">شارك في مسابقاتنا الدورية عبر مواقع التواصل الاجتماعي واربح جوائز ومنتجات حصرية.</p>
+        </div>
+    </div>
+</section>
+
+<section id="stats" class="section">
+    <h2 class="section-title reveal-blur" data-i18n="stats_title">أرقام وحقائق</h2>
+    <div class="stats-container">
+        <div class="stat-box tilt-card reveal-blur" style="transition-delay: 0.1s;">
+            <div class="stat-number" data-target="845">0</div>
+            <div class="stat-text" data-i18n="stat_clients">عميل سعيد</div>
+        </div>
+        <div class="stat-box tilt-card reveal-blur" style="transition-delay: 0.3s;">
+            <div class="stat-number" data-target="120">0</div>
+            <div class="stat-text" data-i18n="stat_products">منتج حصري</div>
+        </div>
+        <div class="stat-box tilt-card reveal-blur" style="transition-delay: 0.5s;">
+            <div class="stat-number" data-target="99" data-suffix="%">0</div>
+            <div class="stat-text" data-i18n="stat_satisfaction">نسبة الرضا</div>
+        </div>
+    </div>
+</section>
+
+<section id="contact" class="section" style="padding-bottom: 150px;">
+    <h2 class="section-title reveal-blur" data-i18n="contact_title">اتصل بنا</h2>
+    <div class="contact-form-container tilt-card reveal-blur">
+        <form class="contact-form">
+            <div class="contact-radio-group">
+                <p data-i18n="form_type_question">أنت؟</p>
+                <label class="contact-radio-option">
+                    <input type="radio" name="type" value="client" checked>
+                    <span data-i18n="form_type_client">عميل</span>
+                </label>
+                <label class="contact-radio-option">
+                    <input type="radio" name="type" value="professional">
+                    <span data-i18n="form_type_pro">محترف</span>
+                </label>
+            </div>
+            <div class="contact-form-row">
+                <div class="contact-form-group">
+                    <input type="text" class="contact-input" placeholder="الاسم" data-i18n-placeholder="form_name">
+                    <svg class="contact-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM7.07 18.28c.43-.9 3.05-1.78 4.93-1.78s4.51.88 4.93 1.78C15.57 19.36 13.86 20 12 20s-3.57-.64-4.93-1.72zM12 5.5c-1.93 0-3.5 1.57-3.5 3.5s1.57 3.5 3.5 3.5 3.5-1.57 3.5-3.5-1.57-3.5-3.5-3.5z"/></svg>
+                </div>
+                <div class="contact-form-group">
+                    <input type="text" class="contact-input" placeholder="اللقب" data-i18n-placeholder="form_firstname">
+                    <svg class="contact-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM7.07 18.28c.43-.9 3.05-1.78 4.93-1.78s4.51.88 4.93 1.78C15.57 19.36 13.86 20 12 20s-3.57-.64-4.93-1.72zM12 5.5c-1.93 0-3.5 1.57-3.5 3.5s1.57 3.5 3.5 3.5 3.5-1.57 3.5-3.5-1.57-3.5-3.5-3.5z"/></svg>
+                </div>
+            </div>
+            <div class="contact-form-row">
+                <div class="contact-form-group">
+                    <input type="email" class="contact-input" placeholder="البريد الإلكتروني" data-i18n-placeholder="form_email">
+                    <svg class="contact-icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                </div>
+                <div class="contact-form-group">
+                    <input type="tel" class="contact-input" placeholder="الهاتف" data-i18n-placeholder="form_phone">
+                    <svg class="contact-icon" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                </div>
+            </div>
+            <div class="contact-form-group">
+                <input type="text" class="contact-input" placeholder="الموضوع" data-i18n-placeholder="form_subject">
+                <svg class="contact-icon" viewBox="0 0 24 24"><path d="M11.07 12.85c.77-1.39 2.25-2.21 3.11-3.44.3-.43.48-.94.48-1.51 0-1.45-1.18-2.63-2.63-2.63-1.45 0-2.63 1.18-2.63 2.63H6.62c0-2.99 2.43-5.41 5.42-5.41s5.41 2.43 5.41 5.41c0 1.17-.37 2.25-1 3.12-.91 1.25-2.22 2.03-3.02 3.44H11.07zM11.97 19.16c1.1 0 1.99-.89 1.99-1.99s-.89-1.99-1.99-1.99-1.99.89-1.99 1.99.89 1.99 1.99 1.99z"/></svg>
+            </div>
+            <div class="contact-form-group">
+                <textarea class="contact-textarea" placeholder="الرسالة" data-i18n-placeholder="form_message"></textarea>
+                <svg class="contact-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM4 4h16v11h-14l-2 2V4z"/></svg>
+            </div>
+            <button type="submit" class="contact-submit-btn" data-i18n="form_send">إرسال</button>
+        </form>
+    </div>
+</section>
+
+<a href="#" class="floating-chat-btn" id="chatBtn">
+    <div class="chat-pulse"></div>
+    <svg viewBox="0 0 24 24">
+        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/>
+        <path d="M7 9h10v2H7zm0-3h10v2H7zm0 6h7v2H7z"/>
+    </svg>
+</a>
+
+<div class="chat-overlay" id="chatOverlay">
+    <div class="chat-window">
+        <div class="chat-confirm-overlay" id="chatConfirmOverlay">
+            <div class="chat-confirm-box">
+                <h4 data-i18n="chat_confirm_title">إنهاء المحادثة</h4>
+                <p data-i18n="chat_confirm_msg">هل تود فعلاً مغادرة المحادثة؟ سيتم محو جميع الرسائل السابقة لضمان خصوصيتك ولن تتمكن من استرجاعها.</p>
+                <div class="chat-confirm-actions">
+                    <button class="btn-cancel" id="cancelClose" data-i18n="chat_confirm_no">لا، العودة للمحادثة</button>
+                    <button class="btn-confirm" id="confirmClose" data-i18n="chat_confirm_yes">نعم، امسح المحادثة</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+        </div>
+        
+        <div class="chat-header">
+            <h3 data-i18n="chat_title">المساعد الذكي Oasis</h3>
+            <div class="chat-header-actions">
+                <button class="action-btn minimize-btn" id="minimizeChat">−</button>
+                <button class="action-btn close-btn" id="closeChat">✕</button>
+            </div>
+        </div>
+        
+        <div class="chat-body" id="chatBody">
+            <div class="message bot" data-i18n="chat_initial">مرحباً بك في Oasis! 👋<br>كيف يمكنني مساعدتك اليوم؟ اكتشف أحدث منتجاتنا أو اسأل عن الموزعين.</div>
+        </div>
+        
+        <div class="chat-footer">
+            <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." data-i18n-placeholder="chat_input">
+            <button id="sendChat">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 1. تأثير الـ 3D Tilt ---
+    const tiltCards = document.querySelectorAll('.tilt-card');
+    tiltCards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -10;
+            const rotateY = ((x - centerX) / centerX) * 10;
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+        });
+    });
+
+    // --- 2. منتجات السلايدر ---
+   const productsData = [
+        { img: 'mon_not_background/nss.png', nameKey: 'prod_1_name', labelKey: 'prod_1_label' },
+        { img: 'mon_not_background/sn.png', nameKey: 'prod_2_name', labelKey: 'prod_2_label' },
+        { img: 'mon_not_background/s.png', nameKey: 'prod_3_name', labelKey: 'prod_3_label' },
+        { img: 'mon_not_background/sss.png', nameKey: 'prod_4_name', labelKey: 'prod_4_label' },
+        { img: 'mon_not_background/ns.png', nameKey: 'prod_5_name', labelKey: 'prod_5_label' },
+        { img: 'mon_not_background/ssss.png', nameKey: 'prod_6_name', labelKey: 'prod_6_label' },
+        { img: 'mon_not_background/bs.png', nameKey: 'prod_7_name', labelKey: 'prod_7_label' },
+        { img: 'mon_not_background/bn.png', nameKey: 'prod_8_name', labelKey: 'prod_8_label' }
+    ];
+    
+    let currentIndex = 0;
+    const thumbnailsTrack = document.getElementById('thumbnailsTrack');
+    
+    productsData.forEach((product, index) => {
+        const thumbnail = document.createElement('div');
+        thumbnail.classList.add('thumbnail');
+        if (index === 0) thumbnail.classList.add('active');
+        thumbnail.setAttribute('onclick', `selectProduct(${index})`);
+
+        const thumbCircle = document.createElement('div');
+        thumbCircle.classList.add('thumb-circle'); 
+        const img = document.createElement('img');
+        img.src = product.img;
+        thumbCircle.appendChild(img);
+
+        const label = document.createElement('span');
+        label.classList.add('thumb-label');
+        label.setAttribute('data-i18n', product.labelKey);
+
+        thumbnail.appendChild(thumbCircle);
+        thumbnail.appendChild(label);
+        thumbnailsTrack.appendChild(thumbnail);
+    });
+
+    function selectProduct(index) {
+        currentIndex = index;
+        const mainImg = document.getElementById('mainProductImg');
+        const mainName = document.getElementById('mainProductName');
+        
+        mainImg.classList.add('fade-out');
+        setTimeout(() => {
+            mainImg.src = productsData[index].img;
+            mainName.setAttribute('data-i18n', productsData[index].nameKey);
+            const currentLang = document.documentElement.lang || 'ar';
+            mainName.innerText = translations[currentLang][productsData[index].nameKey];
+            mainImg.classList.remove('fade-out');
+        }, 400);
+
+        document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+            if(i === index) {
+                thumb.classList.add('active');
+                thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            } else {
+                thumb.classList.remove('active');
+            }
+        });
+    }
+
+    function nextProduct() { selectProduct((currentIndex + 1) % productsData.length); }
+    function prevProduct() { selectProduct((currentIndex - 1 + productsData.length) % productsData.length); }
+
+    // --- 3. جافاسكريبت للترجمة الشاملة ---
+    const translations = {
+        ar: {
+            home: "الرئيسية", about: "معلومات عنا", products: "منتجاتنا", distributors: "موزعينا", 
+            competitions: "مسابقات", media: "وسائل الإعلام", stats: "إحصائياتنا", contact: "اتصل بنا",
+            about_title: "رؤيتنا للمستقبل", about_desc: "نحن نسعى لتقديم أفضل المنتجات بأعلى معايير الجودة العالمية. تصميمنا مستوحى من الطبيعة، ونعمل باستمرار على تطوير حلول مبتكرة تلبي تطلعات عملائنا وترتقي بأسلوب حياتهم إلى مستوى آخر من الفخامة.",
+            dist_title: "موزعينا المعتمدين", dist_local: "محلياً", dist_local_desc: "شبكة واسعة تغطي جميع مناطق الوطن لضمان وصول منتجاتنا إليكم بسرعة وسهولة.",
+            dist_global: "دولياً", dist_global_desc: "نحن فخورون بشراكاتنا الدولية التي تساهم في تقديم جودتنا للأسواق العالمية.",
+            comp_media_title: "تفاعل معنا", media_desc: "تابع آخر أخبارنا، الإصدارات الصحفية، والفعاليات التي نشارك فيها عبر منصاتنا المتعددة.", comp_desc: "شارك في مسابقاتنا الدورية عبر مواقع التواصل الاجتماعي واربح جوائز ومنتجات حصرية.",
+            stats_title: "أرقام وحقائق", stat_clients: "عميل سعيد", stat_products: "منتج حصري", stat_satisfaction: "نسبة الرضا", discover_all: "اكتشف جميع منتجاتنا", btn_discover: "اكتشف",
+            prod_1_name: "الواحة صابون اليدن - التفاح 1لتر", prod_1_label: "التفاح 1لتر",
+            prod_2_name: "الواحة صابون - برتقال 1لتر", prod_2_label: "البرتقال 1لتر",
+            prod_3_name: "الواحة s - فراولة 1لتر", prod_3_label: "الفراولة 1لتر",
+            prod_4_name: "الواحة sss - ليمون 1لتر", prod_4_label: "الليمون 1لتر",
+            prod_5_name: "الواحة ns - التفاح 2لتر", prod_5_label: "التفاح 2لتر",
+            prod_6_name: "الواحة ssss - ليمون 2لتر", prod_6_label: "الليمون 2لتر",
+            prod_7_name: "الواحة bs - أصلي 1لتر", prod_7_label: "الأصلي 1لتر",
+            prod_8_name: "الواحة bn - أصلي 2لتر", prod_8_label: "الأصلي 2لتر",
+            contact_title: "اتصل بنا", form_type_question: "أنت؟", form_type_client: "عميل", form_type_pro: "محترف",
+            form_name: "الاسم", form_firstname: "اللقب", form_email: "البريد الإلكتروني", form_phone: "الهاتف", form_subject: "الموضوع", form_message: "الرسالة", form_send: "إرسال",
+            // نصوص المساعد الذكي ورسائل التأكيد
+            chat_title: "المساعد الذكي Oasis",
+            chat_initial: "مرحباً بك في Oasis! 👋<br>كيف يمكنني مساعدتك اليوم؟ اكتشف أحدث منتجاتنا أو اسأل عن الموزعين.",
+            chat_input: "اكتب رسالتك هنا...",
+            chat_reply: "شكراً لتواصلك معنا! لقد استلمنا رسالتك وسيقوم أحد ممثلينا بالرد عليك في أقرب وقت ممكن. هل هناك شيء آخر تود الاستفسار عنه؟",
+            chat_confirm_title: "إنهاء المحادثة",
+            chat_confirm_msg: "هل تود فعلاً مغادرة المحادثة؟ سيتم محو جميع الرسائل السابقة لضمان خصوصيتك ولن تتمكن من استرجاعها.",
+            chat_confirm_yes: "نعم، امسح المحادثة",
+            chat_confirm_no: "لا، العودة للمحادثة"
+        },
+        en: {
+            home: "Home", about: "About Us", products: "Products", distributors: "Distributors", 
+            competitions: "Competitions", media: "Media", stats: "Stats", contact: "Contact",
+            about_title: "Our Vision for the Future", about_desc: "We strive to provide the best products with the highest international quality standards. Our design is inspired by nature, and we continuously work on developing innovative solutions.",
+            dist_title: "Authorized Distributors", dist_local: "Local", dist_local_desc: "A wide network covering all regions to ensure our products reach you quickly and easily.",
+            dist_global: "Global", dist_global_desc: "We are proud of our international partnerships that help deliver our quality to global markets.",
+            comp_media_title: "Interact with Us", media_desc: "Follow our latest news, press releases, and events we participate in across our platforms.", comp_desc: "Participate in our regular social media competitions and win exclusive prizes and products.",
+            stats_title: "Facts & Figures", stat_clients: "Happy Client", stat_products: "Exclusive Product", stat_satisfaction: "Satisfaction Rate", discover_all: "Discover all products", btn_discover: "Discover",
+            prod_1_name: "Oasis ns - Apple 1L", prod_1_label: "Apple 1L",
+            prod_2_name: "Oasis sn - Orange 1L", prod_2_label: "Orange 1L",
+            prod_3_name: "Oasis s - Strawberry 1L", prod_3_label: "Strawberry 1L",
+            prod_4_name: "Oasis sss - Lemon 1L", prod_4_label: "Lemon 1L",
+            prod_5_name: "Oasis ns - Apple 2L", prod_5_label: "Apple 2L",
+            prod_6_name: "Oasis ssss - Lemon 2L", prod_6_label: "Lemon 2L",
+            prod_7_name: "Oasis bs - Original 1L", prod_7_label: "Original 1L",
+            prod_8_name: "Oasis bn - Original 2L", prod_8_label: "Original 2L",
+            contact_title: "Contact Us", form_type_question: "Are you?", form_type_client: "Client", form_type_pro: "Professional",
+            form_name: "Name", form_firstname: "First Name", form_email: "Email", form_phone: "Phone", form_subject: "Subject", form_message: "Message", form_send: "Send",
+            // Smart Assistant Texts
+            chat_title: "Oasis Smart Assistant",
+            chat_initial: "Welcome to Oasis! 👋<br>How can I help you today? Discover our latest products or ask about distributors.",
+            chat_input: "Type your message here...",
+            chat_reply: "Thank you for contacting us! We have received your message and a representative will reply as soon as possible. Is there anything else you need?",
+            chat_confirm_title: "End Chat",
+            chat_confirm_msg: "Would you really like to leave the chat? All previous messages will be erased to ensure your privacy and cannot be recovered.",
+            chat_confirm_yes: "Yes, clear the chat",
+            chat_confirm_no: "No, return to chat"
+        },
+        fr: {
+            home: "Accueil", about: "À Propos", products: "Produits", distributors: "Distributeurs", 
+            competitions: "Compétitions", media: "Médias", stats: "Chiffres", contact: "Contact",
+            about_title: "Notre Vision pour l'Avenir", about_desc: "Nous nous efforçons de fournir les meilleurs produits avec les normes de qualité internationales les plus élevées. Notre design est inspiré par la nature, et nous développons des solutions innovantes.",
+            dist_title: "Nos Distributeurs Agréés", dist_local: "Local", dist_local_desc: "Un vaste réseau couvrant toutes les régions pour garantir que nos produits vous parviennent rapidement et facilement.",
+            dist_global: "Mondial", dist_global_desc: "Nous sommes fiers de nos partenariats internationaux qui contribuent à offrir notre qualité aux marchés mondiaux.",
+            comp_media_title: "Interagissez avec nous", media_desc: "Suivez nos dernières nouvelles, communiqués de presse et événements sur nos multiples plateformes.", comp_desc: "Participez à nos compétitions régulières sur les réseaux sociaux et gagnez des prix exclusifs.",
+            stats_title: "Faits et Chiffres", stat_clients: "Client Heureux", stat_products: "Produit Exclusif", stat_satisfaction: "Taux de Satisfaction", discover_all: "Découvrez tous les produits", btn_discover: "Découvrir",
+            prod_1_name: "Oasis ns - Pomme 1L", prod_1_label: "Pomme 1L",
+            prod_2_name: "Oasis sn - Orange 1L", prod_2_label: "Orange 1L",
+            prod_3_name: "Oasis s - Fraise 1L", prod_3_label: "Fraise 1L",
+            prod_4_name: "Oasis sss - Citron 1L", prod_4_label: "Citron 1L",
+            prod_5_name: "Oasis ns - Pomme 2L", prod_5_label: "Pomme 2L",
+            prod_6_name: "Oasis ssss - Citron 2L", prod_6_label: "Citron 2L",
+            prod_7_name: "Oasis bs - Original 1L", prod_7_label: "Original 1L",
+            prod_8_name: "Oasis bn - Original 2L", prod_8_label: "Original 2L",
+            contact_title: "Contactez-nous", form_type_question: "Vous êtes ?", form_type_client: "Client", form_type_pro: "Professionnel",
+            form_name: "Nom", form_firstname: "Prénom", form_email: "Email", form_phone: "Téléphone", form_subject: "Objet", form_message: "Message", form_send: "Envoyer",
+            // Textes de l'assistant intelligent
+            chat_title: "Assistant Intelligent Oasis",
+            chat_initial: "Bienvenue chez Oasis ! 👋<br>Comment puis-je vous aider aujourd'hui ? Découvrez nos derniers produits ou posez des questions sur les distributeurs.",
+            chat_input: "Tapez votre message ici...",
+            chat_reply: "Merci de nous avoir contactés ! Nous avons bien reçu votre message et un représentant vous répondra dans les plus brefs délais. Avez-vous d'autres questions ?",
+            chat_confirm_title: "Terminer le chat",
+            chat_confirm_msg: "Voulez-vous vraiment quitter le chat ? Tous les messages précédents seront effacés pour garantir votre confidentialité et ne pourront pas être récupérés.",
+            chat_confirm_yes: "Oui, effacer le chat",
+            chat_confirm_no: "Non, retourner"
+        }
+    };
+
+    function toggleNav() {
+        const menu = document.getElementById("navMenu");
+        const btn = document.querySelector(".menu-btn");
+        menu.classList.toggle("active");
+        btn.innerHTML = menu.classList.contains("active") ? "✕" : "☰";
+        if(!menu.classList.contains("active")) document.getElementById("langDropdown").classList.remove("active");
+    }
+
+    function toggleLangMenu() { document.getElementById("langDropdown").classList.toggle("active"); }
+
+    function changeLanguage(langCode) {
+        document.documentElement.lang = langCode;
+        document.documentElement.dir = langCode === 'ar' ? 'rtl' : 'ltr';
+        
+        document.querySelectorAll('[data-i18n]').forEach(el => { 
+            el.innerHTML = translations[langCode][el.getAttribute('data-i18n')]; 
+        });
+        
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { 
+            el.setAttribute('placeholder', translations[langCode][el.getAttribute('data-i18n-placeholder')]); 
+        });
+        
+        document.getElementById('currentLang').innerText = langCode.toUpperCase();
+        document.getElementById("langDropdown").classList.remove("active");
+        toggleNav();
+        
+        document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
+            const labelKey = productsData[index].labelKey;
+            thumb.querySelector('.thumb-label').innerText = translations[langCode][labelKey];
+        });
+    }
+
+    // --- 4. جافاسكريبت لحركات الظهور ---
+    const observeElements = document.querySelectorAll('.reveal-blur');
+    const revealCallback = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                if(entry.target.classList.contains('stat-box')) {
+                    const numElement = entry.target.querySelector('.stat-number');
+                    const target = +numElement.getAttribute('data-target');
+                    const suffix = numElement.getAttribute('data-suffix') || '';
+                    if (numElement.innerText === "0") {
+                        let current = 0;
+                        const increment = target / 50;
+                        const timer = setInterval(() => {
+                            current += increment;
+                            if (current >= target) { numElement.innerText = target + suffix; clearInterval(timer); } 
+                            else { numElement.innerText = Math.ceil(current); }
+                        }, 30);
+                    }
+                }
+                observer.unobserve(entry.target);
+            }
+        });
+    };
+    const revealObserver = new IntersectionObserver(revealCallback, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
+    observeElements.forEach(el => revealObserver.observe(el));
+
+    // --- 5. جافاسكريبت نافذة الدردشة الذكية والتحكم بها ---
+    const chatBtn = document.getElementById('chatBtn');
+    const chatOverlay = document.getElementById('chatOverlay');
+    const minimizeChat = document.getElementById('minimizeChat');
+    const closeChat = document.getElementById('closeChat');
+    const chatConfirmOverlay = document.getElementById('chatConfirmOverlay');
+    const confirmClose = document.getElementById('confirmClose');
+    const cancelClose = document.getElementById('cancelClose');
+    const sendChatBtn = document.getElementById('sendChat');
+    const chatInput = document.getElementById('chatInput');
+    const chatBody = document.getElementById('chatBody');
+
+    // فتح الدردشة
+    chatBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        chatOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; 
+    });
+
+    // 1. زر التصغير (—): يغلق الشاشة فقط ويحتفظ بالمحادثة
+    minimizeChat.addEventListener('click', () => {
+        chatOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto'; 
+    });
+
+    // 2. زر الإغلاق (✕): يظهر شاشة التأكيد أولاً
+    closeChat.addEventListener('click', () => {
+        chatConfirmOverlay.classList.add('active');
+    });
+
+    // 3. إلغاء الإغلاق من شاشة التأكيد (لا)
+    cancelClose.addEventListener('click', () => {
+        chatConfirmOverlay.classList.remove('active');
+    });
+
+    // 4. تأكيد الإغلاق ومسح المحادثة (نعم)
+    confirmClose.addEventListener('click', () => {
+        // إخفاء نوافذ الشات
+        chatConfirmOverlay.classList.remove('active');
+        chatOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+        
+        // إعادة تعيين المحادثة للمسج الأول فقط
+        const currentLang = document.documentElement.lang || 'ar';
+        const initialMsg = translations[currentLang]['chat_initial'];
+        chatBody.innerHTML = `<div class="message bot" data-i18n="chat_initial">${initialMsg}</div>`;
+    });
+
+    // دالة إضافة رسالة جديدة
+    function appendMessage(text, sender, i18nKey = null) {
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message', sender);
+        
+        if(i18nKey) {
+            msgDiv.setAttribute('data-i18n', i18nKey);
+            msgDiv.innerHTML = text;
+        } else {
+            msgDiv.innerText = text;
+        }
+        
+        chatBody.appendChild(msgDiv);
+        chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: 'smooth' });
+    }
+
+    // إرسال الرسالة
+    function handleSend() {
+        const text = chatInput.value.trim();
+        if(text !== "") {
+            appendMessage(text, 'user');
+            chatInput.value = "";
+            
+            setTimeout(() => {
+                const currentLang = document.documentElement.lang || 'ar';
+                appendMessage(translations[currentLang]['chat_reply'], 'bot', 'chat_reply');
+            }, 1000);
+        }
+    }
+
+    sendChatBtn.addEventListener('click', handleSend);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleSend();
+    });
+</script>
+
+</body>
+</html>
